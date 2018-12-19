@@ -9,7 +9,7 @@ var favIconHtml = '<link rel="icon" type="image/png" href="./favicon-32x32.png" 
 
 var swaggerInit
 
-var generateHTML = function (swaggerDoc, opts, options, customCss, customfavIcon, swaggerUrl, customeSiteTitle) {
+var generateHTML = function (swaggerDoc, opts, options, customCss, customfavIcon, swaggerUrl, customeSiteTitle, injectInitialScript) {
   var isExplorer
   var customJs
   var swaggerUrls
@@ -22,6 +22,7 @@ var generateHTML = function (swaggerDoc, opts, options, customCss, customfavIcon
     swaggerUrls = opts.swaggerUrls
     isExplorer = opts.explorer || !!swaggerUrls
     customeSiteTitle = opts.customSiteTitle
+    injectInitialScript = opts.injectInitialScript || false
   } else {
     //support legacy params based function
     isExplorer = opts
@@ -51,6 +52,11 @@ var generateHTML = function (swaggerDoc, opts, options, customCss, customfavIcon
     }
     var js = fs.readFileSync(__dirname + '/swagger-ui-init.js');
     swaggerInit = js.toString().replace('<% swaggerOptions %>', stringify(initOptions))
+    if (injectInitialScript) {
+      htmlWithCustomJs = htmlWithCustomJs.replace('<% swaggerInit %>', `<script> ${swaggerInit} </script>`)
+    } else {
+      htmlWithCustomJs = htmlWithCustomJs.replace('<% swaggerInit %>', '<script src="./swagger-ui-init.js"> </script>')
+    }
     return htmlWithCustomJs.replace('<% title %>', customeSiteTitle)
 }
 
